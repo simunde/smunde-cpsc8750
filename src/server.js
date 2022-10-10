@@ -27,7 +27,10 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-  res.cookie('visitorId', nextVisitorId);
+if(req.cookies['visitorId']){
+  res.cookie('visitorId', nextVisitorId);}
+  else
+  res.cookie('visitorId', nextVisitorId++);
   res.cookie('visited', Date.now().toString());
   res.render('welcome', {
     name: req.query.name || "World",

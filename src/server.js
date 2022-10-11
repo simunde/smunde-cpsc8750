@@ -18,7 +18,7 @@ const port = process.env.PORT || 3000;
 
 let nextVisitorId = 1;
 var currTime = new Date();
-
+let visitormessage = ""
 const {encode} = require('html-entities');
 app.use(express.static('public'));
 
@@ -27,16 +27,33 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-if(req.cookies['visitorId']){
+
+
+let lasttimevisit = req.cookies['visited'];
+
+console.log(lasttimevisit);
+
+  if (isNaN(lasttimevisit)) {
+    visitormessage = "You have never visited before."
+   }
+  else{
+    lasttimevisit = Math.floor((Date.now() - req.cookies['visited']) / 1000);
+      visitormessage = `It has been ${lasttimevisit} seconds since your last visit`;
+  }
+
+  if(req.cookies['visitorId']){
   res.cookie('visitorId', nextVisitorId);}
-  else
+  else{
   res.cookie('visitorId', nextVisitorId++);
+}
+
   res.cookie('visited', Date.now().toString());
+  
   res.render('welcome', {
     name: req.query.name || "World",
-    date: req.query.date || new Date().toLocaleString(),
-    nextVisitorId: req.query.nextVisitorId || nextVisitorId,
-    visited: req.query.visited || Math.round((new Date().getTime() - currTime.getTime()) / 1000),
+    date: new Date().toLocaleString(),
+    nextVisitorId: req.cookies['nextVisitorId'] || nextVisitorId,
+    visited: visitormessage,
   });
 
   currTime = new Date();
